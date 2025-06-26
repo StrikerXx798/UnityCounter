@@ -1,59 +1,46 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
-    const float Delay = 0.5f;
-    const string StartButtonText = "Start";
-    const string PauseButtonText = "Pause";
-    
-    [SerializeField] private TextMeshProUGUI _buttonText;
-
+    private float _delay = 0.5f;
     private bool _isActive;
-    public static int StartCount
-    {
-        get { return 0; }
-    }
-    public int Count { get; private set; }
+    private IEnumerator _coroutine;
+    public const int StartCount = 0;
     
-    public event Action CountChanged;
+    private int _count;
+    public event Action<int> CountChanged;
 
     private void Start()
     {
+        _coroutine = CountCoroutine();
         _isActive = false;
-        Count = StartCount;
-        _buttonText.text = StartButtonText;
+        _count = StartCount;
     }
 
     private IEnumerator CountCoroutine()
     {
-        const bool isRunning = true;
+        var wait = new WaitForSeconds(_delay);
 
-        while (isRunning)
+        while (enabled)
         {
-            var wait = new WaitForSeconds(Delay);
-            Count++;
-            CountChanged?.Invoke();
+            _count++;
+            CountChanged?.Invoke(_count);
             yield return wait;
-            
         }
     }
 
-    public void OnButtonClick()
+    private void OnMouseDown()
     {
-        if (_isActive == false)
-        {
-            _buttonText.text = PauseButtonText;
-            StartCoroutine(CountCoroutine());
-        }
-        else
-        {
-            _buttonText.text = StartButtonText;
-            StopAllCoroutines();
-        }
+        if (_coroutine == null)
+            return;
         
+        if (_isActive == false)
+            StartCoroutine(_coroutine);
+        else
+            StopCoroutine(_coroutine);
+
         _isActive = !_isActive;
     }
 }

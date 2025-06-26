@@ -22,13 +22,8 @@ public class CountView : MonoBehaviour
         _counter.CountChanged -= ChangeText;
     }
 
-    private void Update()
+    private void ChangeText(int count)
     {
-        
-    }
-
-    private void ChangeText()
-    {
-        _text.text = _counter.Count.ToString("");
+        _text.text = count.ToString("");
     }
 }
